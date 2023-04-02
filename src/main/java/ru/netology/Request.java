@@ -1,5 +1,7 @@
 package ru.netology;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
 import java.util.Map;
 import java.util.Objects;
 
@@ -7,9 +9,9 @@ public class Request {
 
     private String requestMethod;
     private Map<String, String> requestHeaders;
-    private String requestBody;
+    private BufferedReader requestBody;
 
-    public Request(String requestMethod, Map<String, String> requestHeaders, String requestBody) {
+    public Request(String requestMethod, Map<String, String> requestHeaders, BufferedReader requestBody) {
         this.requestMethod = requestMethod;
         this.requestHeaders = requestHeaders;
         this.requestBody = requestBody;
@@ -31,11 +33,11 @@ public class Request {
         this.requestHeaders = requestHeaders;
     }
 
-    public String getRequestBody() {
+    public BufferedReader getRequestBody() {
         return requestBody;
     }
 
-    public void setRequestBody(String requestBody) {
+    public void setRequestBody(BufferedReader requestBody) {
         this.requestBody = requestBody;
     }
 
