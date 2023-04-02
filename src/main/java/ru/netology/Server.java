@@ -78,17 +78,36 @@ public class Server {
                         continue;
                     }
 
-                    if (searchHandler("GET", "/start") != null){
-                        Handler handler = searchHandler("GET", "/start");
-                        Request request = new Request("GET", new HashMap<>(), null);
-                        handler.handle(request, new BufferedOutputStream(socket.getOutputStream()));
+                    String requestMethod = parts[0];
+                    String requestUrl = parts[1];
+
+                    Handler handler = searchHandler(requestMethod, requestUrl);
+
+                    if (handler == null) {
+                        continue;
+                    } else {
+                        Request request;
+                        if(requestMethod.equals("GET")){
+                            request = new Request(requestMethod, new HashMap<>(), null);
+                            handler.handle(request, new BufferedOutputStream(socket.getOutputStream()));
+                        }
+                        if(requestMethod.equals("POST")) {
+                            request = new Request(requestMethod, new HashMap<>(), "Hello!");
+                            handler.handle(request, new BufferedOutputStream(socket.getOutputStream()));
+                        }
                     }
 
-                    if (searchHandler("POST", "/start") != null){
-                        Handler handler = searchHandler("POST", "/start");
-                        Request request = new Request("POST", new HashMap<>(), "Hello!");
-                        handler.handle(request, new BufferedOutputStream(socket.getOutputStream()));
-                    }
+//                    if (searchHandler("GET", "/start") != null){
+//                        Handler handler = searchHandler("GET", "/start");
+//                        Request request = new Request("GET", new HashMap<>(), null);
+//                        handler.handle(request, new BufferedOutputStream(socket.getOutputStream()));
+//                    }
+//
+//                    if (searchHandler("POST", "/start") != null){
+//                        Handler handler = searchHandler("POST", "/start");
+//                        Request request = new Request("POST", new HashMap<>(), "Hello!");
+//                        handler.handle(request, new BufferedOutputStream(socket.getOutputStream()));
+//                    }
 
                     final var path = parts[1];
                     if (!validPaths.contains(path)) {
