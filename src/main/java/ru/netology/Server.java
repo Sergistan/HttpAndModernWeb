@@ -1,17 +1,20 @@
 package ru.netology;
 
+import org.apache.http.NameValuePair;
+import org.apache.http.client.utils.URLEncodedUtils;
+
 import java.io.*;
-import java.net.ServerSocket;
-import java.net.Socket;
+import java.net.*;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 public class Server {
     private static final Map<String, Handler> handlersMap = new ConcurrentHashMap<>();
@@ -81,23 +84,27 @@ public class Server {
                     String requestMethod = parts[0];
                     String requestUrl = parts[1];
 
-                    Handler handler = searchHandler(requestMethod, requestUrl);
+                    String[] split = requestUrl.split("\\?");
+                    String requestUrlIgnoreQuery = split[0];
 
-                    if (handler == null) {
-                        continue;
-                    }
+                    Handler handler = searchHandler(requestMethod, requestUrlIgnoreQuery);
 
                     Request request = null;
 
-                    if (requestMethod.equals("GET")) {
-                        request = new Request(requestMethod, new HashMap<>(), null);
+                    if (requestMethod.equals("GET") && requestUrl.startsWith("/start")) {
+                        request = new Request(requestMethod, requestUrl, getQueryParams(requestUrl), new HashMap<>(), null);
                     }
 
                     if (requestMethod.equals("POST")) {
                         request = new Request(requestMethod, new HashMap<>(), in);
                     }
 
-                    handler.handle(request, out);
+                    if (handler == null) {
+                        continue;
+                    } else
+                    {
+                        handler.handle(request, out);
+                    }
 
                     final var path = parts[1];
                     if (!validPaths.contains(path)) {
@@ -150,5 +157,18 @@ public class Server {
             }
         });
     }
+
+    public List<NameValuePair> getQueryParams(String url) {
+        try {
+            return URLEncodedUtils.parse(new URI(url), StandardCharsets.UTF_8);
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
+
+
+
 }
 

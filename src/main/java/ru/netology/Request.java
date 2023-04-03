@@ -1,20 +1,41 @@
 package ru.netology;
 
+import org.apache.http.NameValuePair;
+
 import java.io.BufferedReader;
 import java.io.InputStream;
-import java.util.Map;
-import java.util.Objects;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.util.*;
 
 public class Request {
 
     private String requestMethod;
+    private String requestUrl;
+    private List<NameValuePair> queryParams;
     private Map<String, String> requestHeaders;
     private BufferedReader requestBody;
+
+    public Request(String requestMethod, String requestUrl, List<NameValuePair> queryParams, Map<String, String> requestHeaders, BufferedReader requestBody) {
+        this.requestMethod = requestMethod;
+        this.requestUrl = requestUrl;
+        this.queryParams = queryParams;
+        this.requestHeaders = requestHeaders;
+        this.requestBody = requestBody;
+    }
 
     public Request(String requestMethod, Map<String, String> requestHeaders, BufferedReader requestBody) {
         this.requestMethod = requestMethod;
         this.requestHeaders = requestHeaders;
         this.requestBody = requestBody;
+    }
+
+    public String getRequestUrl() {
+        return requestUrl;
+    }
+
+    public void setRequestUrl(String requestUrl) {
+        this.requestUrl = requestUrl;
     }
 
     public String getRequestMethod() {
@@ -39,6 +60,14 @@ public class Request {
 
     public void setRequestBody(BufferedReader requestBody) {
         this.requestBody = requestBody;
+    }
+
+    public List<NameValuePair> getQueryParams() {
+        return queryParams;
+    }
+
+    public void setQueryParams(List<NameValuePair> queryParams) {
+        this.queryParams = queryParams;
     }
 
     @Override

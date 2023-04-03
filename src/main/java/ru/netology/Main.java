@@ -24,16 +24,17 @@ public class Main {
             ).getBytes());
             Files.copy(filePath, responseStream);
             responseStream.flush();
+            System.out.println(request.getQueryParams());
         });
 
-        server.addHandler("POST", "/start", (request, responseStream) -> {
-            final var filePath = Path.of(".", "public", "/index.html");
+        server.addHandler("POST", "/default-get", (request, responseStream) -> {
+            final var filePath = Path.of(".", "public", "/default-get.html");
             final var mimeType = Files.probeContentType(filePath);
             final var length = Files.size(filePath);
 
 
             responseStream.write((
-                    "HTTP/1.1 200 OK\r\n" +
+                    "HTTP/1.1 201 OK\r\n" +
                             "Content-Type: " + mimeType + "\r\n" +
                             "Content-Length: " + length + "\r\n" +
                             "Connection: close\r\n" +
