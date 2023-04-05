@@ -3,9 +3,6 @@ package ru.netology;
 import org.apache.http.NameValuePair;
 
 import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.util.*;
 
 public class Request {
@@ -16,6 +13,8 @@ public class Request {
     private Map<String, String> requestHeaders;
     private BufferedReader requestBody;
 
+    private HashMap<String,String[]> postParams;
+
     public Request(String requestMethod, String requestUrl, List<NameValuePair> queryParams, Map<String, String> requestHeaders, BufferedReader requestBody) {
         this.requestMethod = requestMethod;
         this.requestUrl = requestUrl;
@@ -24,10 +23,19 @@ public class Request {
         this.requestBody = requestBody;
     }
 
-    public Request(String requestMethod, Map<String, String> requestHeaders, BufferedReader requestBody) {
+    public Request(String requestMethod, Map<String, String> requestHeaders, BufferedReader requestBody, HashMap<String,String[]> postParams) {
         this.requestMethod = requestMethod;
         this.requestHeaders = requestHeaders;
         this.requestBody = requestBody;
+        this.postParams = postParams;
+    }
+
+    public HashMap<String,String[]>getPostParams() {
+        return postParams;
+    }
+
+    public void setPostParams(HashMap<String,String[]> postParams) {
+        this.postParams = postParams;
     }
 
     public String getRequestUrl() {

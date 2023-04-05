@@ -34,7 +34,7 @@ public class Main {
 
 
             responseStream.write((
-                    "HTTP/1.1 201 OK\r\n" +
+                    "HTTP/1.1 200 OK\r\n" +
                             "Content-Type: " + mimeType + "\r\n" +
                             "Content-Length: " + length + "\r\n" +
                             "Connection: close\r\n" +
@@ -43,6 +43,7 @@ public class Main {
             ).getBytes());
             Files.copy(filePath, responseStream);
             responseStream.flush();
+            System.out.println(request.getPostParams());
         });
 
         server.listenToServer();
