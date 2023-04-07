@@ -15,12 +15,11 @@ public class Request {
 
     private HashMap<List<NameValuePair>, List<NameValuePair>> postParams;
 
-    public Request(String requestMethod, String requestUrl, List<NameValuePair> queryParams, Map<String, String> requestHeaders, BufferedReader requestBody) {
+    public Request(String requestMethod, String requestUrl, List<NameValuePair> queryParams, Map<String, String> requestHeaders) {
         this.requestMethod = requestMethod;
         this.requestUrl = requestUrl;
         this.queryParams = queryParams;
         this.requestHeaders = requestHeaders;
-        this.requestBody = requestBody;
     }
 
     public Request(String requestMethod, Map<String, String> requestHeaders, BufferedReader requestBody, HashMap<List<NameValuePair>, List<NameValuePair>> postParams) {

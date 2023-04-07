@@ -92,7 +92,7 @@ public class Server {
                     Request request = null;
 
                     if (requestMethod.equals("GET") && requestUrl.startsWith("/start")) {
-                        request = new Request(requestMethod, requestUrl, getQueryParams(requestUrl), new HashMap<>(), null);
+                        request = new Request(requestMethod, requestUrl, getQueryParams(requestUrl), new HashMap<>());
                     }
 
                     if (requestMethod.equals("POST") && requestUrl.startsWith("/default-get")) {
