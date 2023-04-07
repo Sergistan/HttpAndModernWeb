@@ -5,6 +5,7 @@ import org.apache.http.client.utils.URLEncodedUtils;
 
 import java.io.*;
 import java.net.*;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -163,22 +164,22 @@ public class Server {
         }
     }
 
-    public HashMap<String, List<String>> getPostParam(BufferedReader in) {
-        HashMap<String, List<String>> postBodyMap = new HashMap<>();
-        String line = in.lines().collect(Collectors.joining("\n"));
-        int i = line.indexOf("\n\n");
-        String rawBody = line.substring(i);
-        String trim = rawBody.trim();
-        String[] split1 = trim.split("&");
+    public HashMap<List<NameValuePair>, List<NameValuePair>> getPostParam(BufferedReader in) {
+        HashMap<List<NameValuePair>, List<NameValuePair>> postBodyMap = new HashMap<>();
+        String request = in.lines().collect(Collectors.joining("\n"));
+        int startRawBody = request.indexOf("\n\n");
+        String rawBody = request.substring(startRawBody);
+        String trimRawBody = rawBody.trim();
+        String[] split1 = trimRawBody.split("&");
         for (String s : split1) {
-            List<String> list = new ArrayList<>();
             String[] split2 = s.split("=");
-            if (postBodyMap.containsKey(split2[0])) {
-                List<String> stringList = postBodyMap.get(split2[0]);
-                stringList.add(split2[1]);
+            List<NameValuePair> parseKey = URLEncodedUtils.parse(split2[0], Charset.defaultCharset());
+            List<NameValuePair> parseValue = URLEncodedUtils.parse(split2[1], Charset.defaultCharset());
+            if (postBodyMap.containsKey(parseKey)) {
+                List<NameValuePair> existList = postBodyMap.get(parseKey);
+                existList.add(parseValue.get(0));
             } else {
-                list.add(split2[1]);
-                postBodyMap.put(split2[0], list);
+                postBodyMap.put(parseKey, parseValue);
             }
         }
         return postBodyMap;

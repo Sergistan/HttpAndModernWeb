@@ -13,7 +13,7 @@ public class Request {
     private Map<String, String> requestHeaders;
     private BufferedReader requestBody;
 
-    private HashMap <String, List<String>> postParams;
+    private HashMap<List<NameValuePair>, List<NameValuePair>> postParams;
 
     public Request(String requestMethod, String requestUrl, List<NameValuePair> queryParams, Map<String, String> requestHeaders, BufferedReader requestBody) {
         this.requestMethod = requestMethod;
@@ -23,18 +23,18 @@ public class Request {
         this.requestBody = requestBody;
     }
 
-    public Request(String requestMethod, Map<String, String> requestHeaders, BufferedReader requestBody, HashMap <String, List<String>> postParams) {
+    public Request(String requestMethod, Map<String, String> requestHeaders, BufferedReader requestBody, HashMap<List<NameValuePair>, List<NameValuePair>> postParams) {
         this.requestMethod = requestMethod;
         this.requestHeaders = requestHeaders;
         this.requestBody = requestBody;
         this.postParams = postParams;
     }
 
-    public HashMap <String, List<String>> getPostParams() {
+    public HashMap<List<NameValuePair>, List<NameValuePair>> getPostParams() {
         return postParams;
     }
 
-    public void setPostParams(HashMap <String, List<String>> postParams) {
+    public void setPostParams(HashMap<List<NameValuePair>, List<NameValuePair>> postParams) {
         this.postParams = postParams;
     }
 
