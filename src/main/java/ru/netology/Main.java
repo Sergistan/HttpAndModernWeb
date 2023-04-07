@@ -27,7 +27,7 @@ public class Main {
             System.out.println(request.getQueryParams());
         });
 
-        server.addHandler("POST", "/default-get", (request, responseStream) -> {
+        server.addHandler("POST", "/default-get.html", (request, responseStream) -> {
             final var filePath = Path.of(".", "public", "/default-get.html");
             final var mimeType = Files.probeContentType(filePath);
             final var length = Files.size(filePath);
@@ -38,7 +38,7 @@ public class Main {
                             "Content-Type: " + mimeType + "\r\n" +
                             "Content-Length: " + length + "\r\n" +
                             "Connection: close\r\n" +
-                            "\r\n\r\n" + request.getRequestBody()
+                            "\n\n" + request.getRequestBody()
 
             ).getBytes());
             Files.copy(filePath, responseStream);

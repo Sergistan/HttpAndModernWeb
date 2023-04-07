@@ -13,6 +13,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 public class Server {
     private static final Map<String, Handler> handlersMap = new ConcurrentHashMap<>();
@@ -22,7 +23,7 @@ public class Server {
     ExecutorService executorService = Executors.newFixedThreadPool(64);
 
     final List<String> validPaths = List.of("/index.html", "/spring.svg", "/spring.png",
-            "/resources.html", "/styles.css", "/app.js", "/links.html", "/forms.html", "/classic.html", "/events.html", "/events.js");
+            "/resources.html", "/styles.css", "/app.js", "/links.html", "/forms.html", "/classic.html", "/events.html", "/events.js", "/default-get.html");
 
 
     private static int parsePort() {
@@ -67,7 +68,6 @@ public class Server {
                     throw new RuntimeException(e);
                 }
                 try (
-                        final var inBis = new BufferedInputStream(socket.getInputStream());  // для метода getPostParam
                         final var in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                         final var out = new BufferedOutputStream(socket.getOutputStream());
                 ) {
@@ -95,14 +95,13 @@ public class Server {
                     }
 
                     if (requestMethod.equals("POST") && requestUrl.startsWith("/default-get")) {
-                        request = new Request(requestMethod, new HashMap<>(), in, getPostParam(inBis));
+                        request = new Request(requestMethod, new HashMap<>(), in, getPostParam(in));
                     }
 
-                    if (handler == null) {
-                        continue;
-                    } else {
+                    if (handler != null) {
                         handler.handle(request, out);
                     }
+
 
                     final var path = parts[1];
                     if (!validPaths.contains(path)) {
@@ -164,64 +163,25 @@ public class Server {
         }
     }
 
-    public HashMap<String, String[]> getPostParam(BufferedInputStream in) throws IOException {
-        final var limit = 4096;
-        in.mark(limit);
-        final var buffer = new byte[limit];
-        final var read = in.read(buffer);
-
-        // ищем request line
-        final var requestLineDelimiter = new byte[]{'\r', '\n'};
-        final var requestLineEnd = indexOf(buffer, requestLineDelimiter, 0, read);
-
-        // ищем заголовки
-        final var headersDelimiter = new byte[]{'\r', '\n', '\r', '\n'};
-        final var headersStart = requestLineEnd + requestLineDelimiter.length;
-        final var headersEnd = indexOf(buffer, headersDelimiter, headersStart, read);
-
-        // отматываем на начало буфера
-        in.reset();
-        // пропускаем requestLine
-        in.skip(headersStart);
-
-        final var headersBytes = in.readNBytes(headersEnd - headersStart);
-        final var headers = Arrays.asList(new String(headersBytes).split("\r\n"));
-        System.out.println(headers);
-
-
-        in.skip(headersDelimiter.length);
-        // вычитываем Content-Length, чтобы прочитать body
-        final var contentLength = extractHeader(headers, "Content-Length");
-        if (contentLength.isPresent()) {
-            final var length = Integer.parseInt(contentLength.get());
-            final var bodyBytes = in.readNBytes(length);
-
-            final var body = new String(bodyBytes);
-            System.out.println(body);
-        }
-        return null; // TODO не могу распарсить тело POST-запроса
-    }
-
-
-    private static Optional<String> extractHeader(List<String> headers, String header) {
-        return headers.stream()
-                .filter(o -> o.startsWith(header))
-                .map(o -> o.substring(o.indexOf(" ")))
-                .map(String::trim)
-                .findFirst();
-    }
-
-    private static int indexOf(byte[] array, byte[] target, int start, int max) {
-        outer:
-        for (int i = start; i < max - target.length + 1; i++) {
-            for (int j = 0; j < target.length; j++) {
-                if (array[i + j] != target[j]) {
-                    continue outer;
-                }
+    public HashMap<String, List<String>> getPostParam(BufferedReader in) {
+        HashMap<String, List<String>> postBodyMap = new HashMap<>();
+        String line = in.lines().collect(Collectors.joining("\n"));
+        int i = line.indexOf("\n\n");
+        String rawBody = line.substring(i);
+        String trim = rawBody.trim();
+        String[] split1 = trim.split("&");
+        for (String s : split1) {
+            List<String> list = new ArrayList<>();
+            String[] split2 = s.split("=");
+            if (postBodyMap.containsKey(split2[0])) {
+                List<String> stringList = postBodyMap.get(split2[0]);
+                stringList.add(split2[1]);
+            } else {
+                list.add(split2[1]);
+                postBodyMap.put(split2[0], list);
             }
-            return i;
         }
-        return -1;
+        return postBodyMap;
     }
 
 }
