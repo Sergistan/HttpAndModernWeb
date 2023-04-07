@@ -28,7 +28,7 @@ public class Main {
         });
 
         server.addHandler("POST", "/default-get.html", (request, responseStream) -> {
-            final var filePath = Path.of(".", "public", "/index.html");
+            final var filePath = Path.of(".", "public", "/default-get.html");
             final var mimeType = Files.probeContentType(filePath);
             final var length = Files.size(filePath);
 
@@ -42,6 +42,7 @@ public class Main {
             ).getBytes());
             Files.copy(filePath, responseStream);
             responseStream.flush();
+            System.out.println(request.getPostParams());
         });
 
         server.listenToServer();
