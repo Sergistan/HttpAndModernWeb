@@ -32,7 +32,6 @@ public class Main {
             final var mimeType = Files.probeContentType(filePath);
             final var length = Files.size(filePath);
 
-
             responseStream.write((
                     "HTTP/1.1 200 OK\r\n" +
                             "Content-Type: " + mimeType + "\r\n" +
