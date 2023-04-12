@@ -9,9 +9,20 @@ public class Main {
         Server server = new Server();
         server.startServer();
 
-        server.addHandler("GET", "/start", (request, responseStream) -> {
+        server.addHandler("GET", "/default-get.html", (request, responseStream) -> {
 
-            final var filePath = Path.of(".", "public", "/index.html");
+            responseStream.write((
+                    "HTTP/1.1 200 OK\r\n" +
+                            "Connection: close\r\n" +
+                            "\r\n" +
+                            "Hello from get"
+            ).getBytes());
+            responseStream.flush();
+            System.out.println(request.getQueryParams());
+        });
+
+        server.addHandler("POST", "/default-get.html", (request, responseStream) -> {
+            final var filePath = Path.of(".", "public", "/default-get.html");
             final var mimeType = Files.probeContentType(filePath);
             final var length = Files.size(filePath);
 
@@ -20,29 +31,12 @@ public class Main {
                             "Content-Type: " + mimeType + "\r\n" +
                             "Content-Length: " + length + "\r\n" +
                             "Connection: close\r\n" +
-                            "\r\n"
-            ).getBytes());
-            Files.copy(filePath, responseStream);
-            responseStream.flush();
-            System.out.println(request.getQueryParams());
-        });
-
-        server.addHandler("POST", "/default-get", (request, responseStream) -> {
-            final var filePath = Path.of(".", "public", "/default-get.html");
-            final var mimeType = Files.probeContentType(filePath);
-            final var length = Files.size(filePath);
-
-
-            responseStream.write((
-                    "HTTP/1.1 201 OK\r\n" +
-                            "Content-Type: " + mimeType + "\r\n" +
-                            "Content-Length: " + length + "\r\n" +
-                            "Connection: close\r\n" +
-                            "\r\n\r\n" + request.getRequestBody()
+                            "\n\n" + request.getPostParams()
 
             ).getBytes());
             Files.copy(filePath, responseStream);
             responseStream.flush();
+            System.out.println(request.getPostParams());
         });
 
         server.listenToServer();
